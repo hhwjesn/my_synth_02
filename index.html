@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Тёмный бит</title>
+
+    <link rel="stylesheet" href="reset.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <main class="stage">
+      <section class="master-panel" aria-label="Главное управление">
+        <button type="button" id="startButton" class="start-button">
+          ЗАПУСТИТЬ АУДИО
+        </button>
+
+        <label class="master-volume-control" for="global-volume">
+          <span>ОБЩАЯ ГРОМКОСТЬ</span>
+          <input
+            type="range"
+            id="global-volume"
+            min="0"
+            max="1"
+            step="0.01"
+            value="0.8"
+          />
+        </label>
+
+        <div class="audio-status">
+          <span id="status-dot" class="status-dot"></span>
+          <span id="status-text">АУДИО ВЫКЛ</span>
+        </div>
+      </section>
+
+      <section class="instruments-section">
+        <div class="section-heading">
+          <h2>ИНСТРУМЕНТЫ</h2>
+          <p>Включай слои и собирай свой бит</p>
+        </div>
+
+        <div id="instruments-grid" class="instruments-grid">
+          <!-- 1. Бит -->
+          <article class="instrument-card kick-card">
+            <button
+              type="button"
+              class="square-object"
+              data-id="kick"
+              aria-label="Включить или выключить бит"
+              aria-pressed="false"
+            >
+              <span class="square-number">01</span>
+              <span class="square-name">БИТ</span>
+            </button>
+
+            <div class="instrument-controls">
+              <label>
+                <span>ГРОМКОСТЬ <output data-output="volume">75%</output></span>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value="0.75"
+                  data-control="volume"
+                />
+              </label>
+              <label>
+                <span
+                  >ЧАСТОТА <output data-output="frequency">0 st</output></span
+                >
+                <input
+                  type="range"
+                  min="-12"
+                  max="12"
+                  step="1"
+                  value="0"
+                  data-control="frequency"
+                />
+              </label>
+              <label>
+                <span>СКОРОСТЬ <output data-output="speed">1.00×</output></span>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="2"
+                  step="0.05"
+                  value="1"
+                  data-control="speed"
+                />
+              </label>
+            </div>
+          </article>
+
+          <!-- 2. Бас -->
+          <article class="instrument-card bass-card">
+            <button
+              type="button"
+              class="square-object"
+              data-id="bass"
+              aria-label="Включить или выключить бас"
+              aria-pressed="false"
+            >
+              <span class="square-number">02</span>
+              <span class="square-name">БАС</span>
+            </button>
+
+            <div class="instrument-controls">
+              <label>
+                <span>ГРОМКОСТЬ <output data-output="volume">58%</output></span>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value="0.58"
+                  data-control="volume"
+                />
+              </label>
+              <label>
+                <span
+                  >ЧАСТОТА <output data-output="frequency">0 st</output></span
+                >
+                <input
+                  type="range"
+                  min="-12"
+                  max="12"
+                  step="1"
+                  value="0"
+                  data-control="frequency"
+                />
+              </label>
+              <label>
+                <span>СКОРОСТЬ <output data-output="speed">1.00×</output></span>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="2"
+                  step="0.05"
+                  value="1"
+                  data-control="speed"
+                />
+              </label>
+            </div>
+          </article>
+
+          <!-- 3. Синтезатор -->
+          <article class="instrument-card synth-card">
+            <button
+              type="button"
+              class="square-object"
+              data-id="synth"
+              aria-label="Включить или выключить синтезатор"
+              aria-pressed="false"
+            >
+              <span class="square-number">03</span>
+              <span class="square-name">СИНТ</span>
+            </button>
+
+            <div class="instrument-controls">
+              <label>
+                <span>ГРОМКОСТЬ <output data-output="volume">28%</output></span>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value="0.28"
+                  data-control="volume"
+                />
+              </label>
+              <label>
+                <span
+                  >ЧАСТОТА <output data-output="frequency">0 st</output></span
+                >
+                <input
+                  type="range"
+                  min="-12"
+                  max="12"
+                  step="1"
+                  value="0"
+                  data-control="frequency"
+                />
+              </label>
+              <label>
+                <span>СКОРОСТЬ <output data-output="speed">1.00×</output></span>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="2"
+                  step="0.05"
+                  value="1"
+                  data-control="speed"
+                />
+              </label>
+            </div>
+          </article>
+
+          <!-- 4. Хлопок -->
+          <article class="instrument-card clap-card">
+            <button
+              type="button"
+              class="square-object"
+              data-id="clap"
+              aria-label="Включить или выключить хлопок"
+              aria-pressed="false"
+            >
+              <span class="square-number">04</span>
+              <span class="square-name">ХЛОПОК</span>
+            </button>
+
+            <div class="instrument-controls">
+              <label>
+                <span>ГРОМКОСТЬ <output data-output="volume">30%</output></span>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value="0.30"
+                  data-control="volume"
+                />
+              </label>
+              <label>
+                <span
+                  >ЧАСТОТА <output data-output="frequency">0 st</output></span
+                >
+                <input
+                  type="range"
+                  min="-12"
+                  max="12"
+                  step="1"
+                  value="0"
+                  data-control="frequency"
+                />
+              </label>
+              <label>
+                <span>СКОРОСТЬ <output data-output="speed">1.00×</output></span>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="2"
+                  step="0.05"
+                  value="1"
+                  data-control="speed"
+                />
+              </label>
+            </div>
+          </article>
+
+          <!-- 5. Хэт -->
+          <article class="instrument-card hat-card">
+            <button
+              type="button"
+              class="square-object"
+              data-id="hat"
+              aria-label="Включить или выключить хэт"
+              aria-pressed="false"
+            >
+              <span class="square-number">05</span>
+              <span class="square-name">ХЭТ</span>
+            </button>
+
+            <div class="instrument-controls">
+              <label>
+                <span>ГРОМКОСТЬ <output data-output="volume">13%</output></span>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value="0.13"
+                  data-control="volume"
+                />
+              </label>
+              <label>
+                <span
+                  >ЧАСТОТА <output data-output="frequency">0 st</output></span
+                >
+                <input
+                  type="range"
+                  min="-12"
+                  max="12"
+                  step="1"
+                  value="0"
+                  data-control="frequency"
+                />
+              </label>
+              <label>
+                <span>СКОРОСТЬ <output data-output="speed">1.00×</output></span>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="2"
+                  step="0.05"
+                  value="1"
+                  data-control="speed"
+                />
+              </label>
+            </div>
+          </article>
+
+          <!-- 6. Мелодические акценты -->
+          <article class="instrument-card pluck-card">
+            <button
+              type="button"
+              class="square-object"
+              data-id="pluck"
+              aria-label="Включить или выключить мелодические акценты"
+              aria-pressed="false"
+            >
+              <span class="square-number">06</span>
+            </button>
+
+            <div class="instrument-controls">
+              <label>
+                <span>ГРОМКОСТЬ <output data-output="volume">20%</output></span>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value="0.20"
+                  data-control="volume"
+                />
+              </label>
+              <label>
+                <span
+                  >ЧАСТОТА <output data-output="frequency">0 st</output></span
+                >
+                <input
+                  type="range"
+                  min="-12"
+                  max="12"
+                  step="1"
+                  value="0"
+                  data-control="frequency"
+                />
+              </label>
+              <label>
+                <span>СКОРОСТЬ <output data-output="speed">1.00×</output></span>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="2"
+                  step="0.05"
+                  value="1"
+                  data-control="speed"
+                />
+              </label>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span>ТЁМНЫЙ БИТ</span>
+        <span>6 СЛОЁВ ЗВУКА</span>
+      </footer>
+    </main>
+
+    <script src="scripts/synthesizer.js"></script>
+    <script src="scripts/script.js"></script>
+  </body>
+</html>
