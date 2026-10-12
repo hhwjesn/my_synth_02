@@ -3,7 +3,6 @@ const STEPS = 16
 const STEP_MS = (60 / BPM / 4) * 1000
 
 const PATTERNS = {
-  // Редкий, тяжёлый бит
   kick: [
     1,
     null,
@@ -23,7 +22,6 @@ const PATTERNS = {
     null
   ],
 
-  // Низкий повторяющийся бас
   bass: [
     33,
     null,
@@ -43,7 +41,6 @@ const PATTERNS = {
     null
   ],
 
-  // Холодный короткий мотив
   synth: [
     57,
     null,
@@ -63,7 +60,6 @@ const PATTERNS = {
     null
   ],
 
-  // Сухой хлопок
   clap: [
     null,
     null,
@@ -83,7 +79,6 @@ const PATTERNS = {
     null
   ],
 
-  // Редкий приглушённый хэт
   hat: [
     1,
     null,
@@ -103,7 +98,6 @@ const PATTERNS = {
     null
   ],
 
-  // Отдельные тёмные акценты
   pluck: [
     null,
     null,
