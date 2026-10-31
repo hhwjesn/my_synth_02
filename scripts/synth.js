@@ -1,365 +1,275 @@
-const BPM = 88
-const STEPS = 16
-const STEP_MS = (60 / BPM / 4) * 1000
-
-const PATTERNS = {
-  kick: [
-    1,
-    null,
-    null,
-    null,
-    null,
-    null,
-    1,
-    null,
-    1,
-    null,
-    null,
-    null,
-    null,
-    1,
-    null,
-    null
-  ],
-
-  bass: [
-    33,
-    null,
-    null,
-    null,
-    33,
-    null,
-    null,
-    null,
-    36,
-    null,
-    null,
-    33,
-    null,
-    null,
-    31,
-    null
-  ],
-
-  synth: [
-    57,
-    null,
-    null,
-    60,
-    null,
-    null,
-    57,
-    null,
-    null,
-    64,
-    null,
-    null,
-    60,
-    null,
-    null,
-    null
-  ],
-
-  clap: [
-    null,
-    null,
-    null,
-    null,
-    1,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    1,
-    null,
-    null,
-    null
-  ],
-
-  hat: [
-    1,
-    null,
-    null,
-    1,
-    null,
-    null,
-    1,
-    null,
-    1,
-    null,
-    null,
-    1,
-    null,
-    1,
-    null,
-    null
-  ],
-
-  pluck: [
-    null,
-    null,
-    69,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    67,
-    null,
-    null,
-    null,
-    null,
-    64,
-    null
-  ]
-}
-
-const DEFAULT_SETTINGS = {
-  kick: { volume: 0.75, frequency: 0, speed: 1 },
-  bass: { volume: 0.58, frequency: 0, speed: 1 },
-  synth: { volume: 0.28, frequency: 0, speed: 1 },
-  clap: { volume: 0.3, frequency: 0, speed: 1 },
-  hat: { volume: 0.13, frequency: 0, speed: 1 },
-  pluck: { volume: 0.2, frequency: 0, speed: 1 }
-}
+"use strict"
 
 class Synthesizer {
   constructor() {
-    this.context = null
+    this.audioContext = null
     this.masterGain = null
-    this.scheduler = null
-    this.step = -1
-    this.isMuted = false
-    this.masterVolume = 0.8
+    this.masterVolume = 0.7
+    this.isRunning = false
+    this.isMuted = true
+    this.bpm = 110
+    this.currentStep = 0
+    this.nextStepTime = 0
+    this.schedulerTimer = null
+    this.scheduleAheadTime = 0.12
+    this.schedulerInterval = 25
+
+    this.patterns = {
+      kick: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+      bass: [1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0],
+      synth: [1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1],
+      clap: [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+      hat: [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+      pluck: [1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0]
+    }
+
+    const defaults = {
+      kick: { volume: 0.25, frequency: 0, speed: 1 },
+      bass: { volume: 0.25, frequency: 0, speed: 1 },
+      synth: { volume: 0.25, frequency: 0, speed: 1 },
+      clap: { volume: 0.25, frequency: 0, speed: 1 },
+      hat: { volume: 0.25, frequency: 0, speed: 1 },
+      pluck: { volume: 0.25, frequency: 0, speed: 1 }
+    }
 
     this.voices = new Map()
-
-    this.settings = new Map(
-      Object.entries(DEFAULT_SETTINGS).map(([id, values]) => [
-        id,
-        { ...values }
-      ])
-    )
-  }
-
-  get isInitialized() {
-    return this.context !== null
+    Object.entries(defaults).forEach(([id, settings]) => {
+      this.voices.set(id, { enabled: false, ...settings })
+    })
   }
 
   async start() {
-    if (!this.context) {
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext
+    if (!AudioContextClass)
+      throw new Error("Web Audio API не поддерживается браузером.")
 
-      if (!AudioContextClass) {
-        throw new Error("Web Audio API не поддерживается браузером.")
-      }
-
-      this.context = new AudioContextClass()
-      this.masterGain = this.context.createGain()
-      this.masterGain.gain.value = this.masterVolume
-      this.masterGain.connect(this.context.destination)
+    if (!this.audioContext) {
+      this.audioContext = new AudioContextClass()
+      this.masterGain = this.audioContext.createGain()
+      this.masterGain.gain.value = 0
+      this.masterGain.connect(this.audioContext.destination)
     }
 
-    if (this.context.state === "suspended") {
-      await this.context.resume()
+    if (this.audioContext.state === "suspended") {
+      await this.audioContext.resume()
     }
 
-    if (!this.scheduler) {
-      this.scheduler = window.setInterval(() => this.tick(), STEP_MS)
+    this.isRunning = true
+    this.isMuted = false
+    this.masterGain.gain.setTargetAtTime(
+      this.masterVolume,
+      this.audioContext.currentTime,
+      0.025
+    )
+    this.currentStep = 0
+    this.nextStepTime = this.audioContext.currentTime + 0.05
+
+    if (this.schedulerTimer) clearInterval(this.schedulerTimer)
+    this.schedulerTimer = setInterval(
+      () => this.scheduler(),
+      this.schedulerInterval
+    )
+    this.scheduler()
+  }
+
+  scheduler() {
+    if (!this.isRunning || !this.audioContext) return
+    while (
+      this.nextStepTime <
+      this.audioContext.currentTime + this.scheduleAheadTime
+    ) {
+      this.scheduleStep(this.currentStep, this.nextStepTime)
+      this.nextStepTime += 60 / this.bpm / 4
+      this.currentStep = (this.currentStep + 1) % 16
     }
   }
 
-  tick() {
-    if (!this.context || this.context.state !== "running") return
-
-    this.step = (this.step + 1) % STEPS
-
-    for (const [id, voice] of this.voices) {
-      if (!voice.enabled) continue
-
-      const settings = this.settings.get(id)
-      const pattern = PATTERNS[id]
-      if (!settings || !pattern) continue
-
-      const index = Math.floor(this.step * settings.speed) % STEPS
-      const note = pattern[index]
-
-      if (note === null || note === undefined) continue
-
-      if (id === "kick") this.playKick(settings)
-      else if (id === "clap") this.playNoise(settings, "clap")
-      else if (id === "hat") this.playNoise(settings, "hat")
-      else this.playNote(id, note, settings)
-    }
+  scheduleStep(step, time) {
+    this.voices.forEach((voice, id) => {
+      if (!voice.enabled || !this.patterns[id][step]) return
+      const duration = 60 / this.bpm / 4 / voice.speed
+      switch (id) {
+        case "kick":
+          this.playKick(time, voice.volume)
+          break
+        case "bass":
+          this.playBass(time, voice, duration, step)
+          break
+        case "synth":
+          this.playSynth(time, voice, duration, step)
+          break
+        case "clap":
+          this.playClap(time, voice.volume)
+          break
+        case "hat":
+          this.playNoise(time, voice.volume * 0.35, 0.045, 7000)
+          break
+        case "pluck":
+          this.playPluck(time, voice, duration, step)
+          break
+      }
+    })
   }
 
   toggleVoice(id) {
-    if (!PATTERNS[id]) return false
-
-    const enabled = !(this.voices.get(id)?.enabled ?? false)
-    this.voices.set(id, { enabled })
-    return enabled
+    const voice = this.voices.get(id)
+    if (!voice) return false
+    voice.enabled = !voice.enabled
+    return voice.enabled
   }
 
   setVoiceVolume(id, value) {
-    const settings = this.settings.get(id)
-    if (settings) settings.volume = this.clamp(value, 0, 1)
+    const voice = this.voices.get(id)
+    if (voice) voice.volume = this.clamp(value, 0, 1)
   }
 
   setVoiceFrequency(id, value) {
-    const settings = this.settings.get(id)
-    if (settings) settings.frequency = this.clamp(value, -12, 12)
+    const voice = this.voices.get(id)
+    if (voice) voice.frequency = this.clamp(value, -12, 12)
   }
 
   setVoiceSpeed(id, value) {
-    const settings = this.settings.get(id)
-    if (settings) settings.speed = this.clamp(value, 0.5, 2)
+    const voice = this.voices.get(id)
+    if (voice) voice.speed = this.clamp(value, 0.5, 2)
   }
 
   setMasterVolume(value) {
     this.masterVolume = this.clamp(value, 0, 1)
-
-    if (this.masterGain && this.context) {
+    if (this.masterGain && this.audioContext && !this.isMuted) {
       this.masterGain.gain.setTargetAtTime(
-        this.isMuted ? 0 : this.masterVolume,
-        this.context.currentTime,
-        0.02
+        this.masterVolume,
+        this.audioContext.currentTime,
+        0.025
       )
     }
   }
 
   toggleMasterMute() {
+    if (!this.audioContext || !this.masterGain) return true
     this.isMuted = !this.isMuted
-
-    if (this.masterGain && this.context) {
-      this.masterGain.gain.setTargetAtTime(
-        this.isMuted ? 0 : this.masterVolume,
-        this.context.currentTime,
-        0.02
-      )
-    }
-
+    const target = this.isMuted ? 0 : this.masterVolume
+    this.masterGain.gain.setTargetAtTime(
+      target,
+      this.audioContext.currentTime,
+      0.025
+    )
     return this.isMuted
   }
 
-  clamp(value, min, max) {
-    return Math.max(min, Math.min(max, Number(value)))
+  playKick(time, volume) {
+    const osc = this.audioContext.createOscillator()
+    const gain = this.audioContext.createGain()
+    osc.type = "sine"
+    osc.frequency.setValueAtTime(150, time)
+    osc.frequency.exponentialRampToValueAtTime(42, time + 0.16)
+    gain.gain.setValueAtTime(Math.max(volume, 0.001), time)
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.2)
+    osc.connect(gain)
+    gain.connect(this.masterGain)
+    osc.start(time)
+    osc.stop(time + 0.21)
   }
 
-  midiToHz(note, settings) {
-    return 440 * Math.pow(2, (note + settings.frequency - 69) / 12)
+  playBass(time, voice, duration, step) {
+    const osc = this.audioContext.createOscillator()
+    const gain = this.audioContext.createGain()
+    const notes = [0, 0, 7, 0, 3, 0, 7, 0]
+    osc.type = "sawtooth"
+    osc.frequency.setValueAtTime(
+      55 * Math.pow(2, (notes[step % 8] + voice.frequency) / 12),
+      time
+    )
+    gain.gain.setValueAtTime(0.001, time)
+    gain.gain.linearRampToValueAtTime(voice.volume * 0.35, time + 0.015)
+    gain.gain.exponentialRampToValueAtTime(
+      0.001,
+      time + Math.max(0.08, duration * 0.85)
+    )
+    osc.connect(gain)
+    gain.connect(this.masterGain)
+    osc.start(time)
+    osc.stop(time + duration)
   }
 
-  playNote(id, note, settings) {
-    const now = this.context.currentTime
-    const osc = this.context.createOscillator()
-    const gain = this.context.createGain()
-
-    const hz = this.midiToHz(note, settings)
-    const duration = id === "bass" ? 0.22 : id === "synth" ? 0.18 : 0.12
-
-    if (id === "bass") {
-      osc.type = "triangle"
-      osc.frequency.setValueAtTime(hz, now)
-    } else if (id === "synth") {
-      osc.type = "sawtooth"
-      osc.frequency.setValueAtTime(hz, now)
-    } else {
-      osc.type = "triangle"
-      osc.frequency.setValueAtTime(hz, now)
-    }
-
-    // Приглушаем верх, чтобы звук был более сухим и тёмным.
-    const filter = this.context.createBiquadFilter()
+  playSynth(time, voice, duration, step) {
+    const osc = this.audioContext.createOscillator()
+    const filter = this.audioContext.createBiquadFilter()
+    const gain = this.audioContext.createGain()
+    const notes = [0, 7, 12, 7, 3, 10, 12, 7]
+    osc.type = "triangle"
+    osc.frequency.setValueAtTime(
+      220 * Math.pow(2, (notes[step % 8] + voice.frequency) / 12),
+      time
+    )
     filter.type = "lowpass"
-    filter.frequency.value = id === "bass" ? 220 : id === "synth" ? 1300 : 1900
-
-    const peak =
-      id === "bass"
-        ? settings.volume * 0.42
-        : id === "synth"
-          ? settings.volume * 0.22
-          : settings.volume * 0.26
-
-    gain.gain.setValueAtTime(0.0001, now)
-    gain.gain.linearRampToValueAtTime(Math.max(0.0001, peak), now + 0.008)
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration)
-
+    filter.frequency.value = 1800
+    gain.gain.setValueAtTime(0.001, time)
+    gain.gain.linearRampToValueAtTime(voice.volume * 0.22, time + 0.025)
+    gain.gain.exponentialRampToValueAtTime(0.001, time + duration * 0.9)
     osc.connect(filter)
     filter.connect(gain)
     gain.connect(this.masterGain)
-
-    osc.start(now)
-    osc.stop(now + duration + 0.02)
+    osc.start(time)
+    osc.stop(time + duration)
   }
 
-  playKick(settings) {
-    const now = this.context.currentTime
-    const osc = this.context.createOscillator()
-    const gain = this.context.createGain()
+  playClap(time, volume) {
+    this.playNoise(time, volume * 0.55, 0.12, 1400)
+    this.playNoise(time + 0.025, volume * 0.35, 0.1, 1700)
+    this.playNoise(time + 0.05, volume * 0.2, 0.08, 2000)
+  }
 
-    const base = this.midiToHz(36, settings)
-
-    osc.type = "sine"
-    osc.frequency.setValueAtTime(base * 2.4, now)
-    osc.frequency.exponentialRampToValueAtTime(
-      Math.max(32, base * 0.75),
-      now + 0.13
+  playNoise(time, volume, duration, frequency) {
+    const length = Math.max(
+      1,
+      Math.floor(this.audioContext.sampleRate * duration)
     )
-
-    gain.gain.setValueAtTime(Math.max(0.0001, settings.volume * 0.72), now)
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2)
-
-    osc.connect(gain)
-    gain.connect(this.masterGain)
-
-    osc.start(now)
-    osc.stop(now + 0.22)
-  }
-
-  playNoise(settings, type) {
-    const now = this.context.currentTime
-    const duration = type === "clap" ? 0.13 : 0.045
-    const length = Math.floor(this.context.sampleRate * duration)
-    const buffer = this.context.createBuffer(1, length, this.context.sampleRate)
-
+    const buffer = this.audioContext.createBuffer(
+      1,
+      length,
+      this.audioContext.sampleRate
+    )
     const data = buffer.getChannelData(0)
-    for (let i = 0; i < length; i++) {
-      data[i] = Math.random() * 2 - 1
-    }
+    for (let i = 0; i < length; i++) data[i] = Math.random() * 2 - 1
 
-    const source = this.context.createBufferSource()
-    const filter = this.context.createBiquadFilter()
-    const gain = this.context.createGain()
-
+    const source = this.audioContext.createBufferSource()
+    const filter = this.audioContext.createBiquadFilter()
+    const gain = this.audioContext.createGain()
     source.buffer = buffer
-
-    const cutoff =
-      (type === "hat" ? 6500 : 1600) * Math.pow(2, settings.frequency / 12)
-
-    filter.type = type === "hat" ? "highpass" : "bandpass"
-    filter.frequency.value = this.clamp(
-      cutoff,
-      type === "hat" ? 2500 : 500,
-      type === "hat" ? 12000 : 7000
-    )
-
-    gain.gain.setValueAtTime(
-      Math.max(0.0001, settings.volume * (type === "hat" ? 0.28 : 0.42)),
-      now
-    )
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration)
-
+    filter.type = "highpass"
+    filter.frequency.value = frequency
+    gain.gain.setValueAtTime(Math.max(volume, 0.001), time)
+    gain.gain.exponentialRampToValueAtTime(0.001, time + duration)
     source.connect(filter)
     filter.connect(gain)
     gain.connect(this.masterGain)
+    source.start(time)
+    source.stop(time + duration)
+  }
 
-    source.start(now)
-    source.stop(now + duration)
+  playPluck(time, voice, duration, step) {
+    const osc = this.audioContext.createOscillator()
+    const gain = this.audioContext.createGain()
+    const notes = [0, 12, 7, 15, 12, 7, 3, 10]
+    osc.type = "triangle"
+    osc.frequency.setValueAtTime(
+      330 * Math.pow(2, (notes[step % 8] + voice.frequency) / 12),
+      time
+    )
+    gain.gain.setValueAtTime(Math.max(voice.volume * 0.3, 0.001), time)
+    gain.gain.exponentialRampToValueAtTime(
+      0.001,
+      time + Math.min(0.35, duration * 0.9)
+    )
+    osc.connect(gain)
+    gain.connect(this.masterGain)
+    osc.start(time)
+    osc.stop(time + Math.min(0.36, duration))
+  }
+
+  clamp(value, min, max) {
+    const number = Number(value)
+    return Math.min(max, Math.max(min, Number.isFinite(number) ? number : min))
   }
 }
 

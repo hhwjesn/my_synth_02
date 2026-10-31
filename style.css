@@ -3,153 +3,210 @@
 }
 
 :root {
-  --background: #100f0e;
-  --panel: #1b1916;
-  --card: #211e1a;
-  --text: #e7d9c5;
-  --muted: #a99a85;
-  --border: #494034;
-  --warm-light: #f1bd68;
+  --orange: #ff9a08;
+  --navy: #1e2354;
+  --blue: rgba(10, 85, 209, 0.8);
+  --blue-dark: #06378a;
+  --yellow: #eeff10;
+  --square: #ebaf1b;
+  --black: #000000;
+  --white: #ffffff;
+  --instrument-color: var(--square);
+  --page-image: none;
 }
 
+/* ШРИФТЫ */
+@font-face {
+  font-family: "Pricedown";
+  src: url("fonts/Pricedown.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Gamestation";
+  src: url("fonts/Gamestation.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ОСНОВНАЯ СТРАНИЦА */
 html,
 body {
   margin: 0;
   min-height: 100%;
 }
-
 body {
-  padding: 28px 16px;
-  color: var(--text);
-  background:
-    radial-gradient(ellipse at 50% 0%, #44301d 0%, transparent 48%),
-    linear-gradient(180deg, #171614 0%, #0b0c0d 100%);
-  font-family: Arial, Helvetica, sans-serif;
+  position: relative;
+  min-height: 100vh;
+  padding: 25px 32px 50px;
+  overflow-x: hidden;
+  color: var(--black);
+  background-image: url("images/VHS.jpg");
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+  font-family: "Gamestation", Arial, sans-serif;
 }
-
 button,
 input {
   font: inherit;
 }
 
+/* ЭФФЕКТ ШУМА */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0.1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+/* ОСНОВНАЯ РАБОЧАЯ ОБЛАСТЬ */
 .stage {
   position: relative;
   isolation: isolate;
   width: 100%;
-  max-width: 1000px;
+  max-width: 1160px;
   margin: 0 auto;
-  padding: 22px 28px 28px;
-  overflow: hidden;
-  background: rgba(23, 21, 18, 0.96);
-  border: 1px solid #594936;
-  border-radius: 8px;
-  box-shadow: 0 20px 80px #0009;
+  padding: 0;
+  overflow: visible;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 
-/* Панель управления */
-
+/* ШАПКА: ЛОГОТИП + КНОПКА */
 .master-panel {
+  position: relative;
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 22px;
-  padding: 16px;
-  margin: 0 0 32px;
-  background: #211d18;
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  gap: 0;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0;
+  margin: 0 0 23px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
 }
 
-.start-button {
-  padding: 12px 18px;
-  color: #21170c;
-  background: var(--warm-light);
-  border: 1px solid #f5d493;
-  border-radius: 3px;
-  font-size: 12px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: filter 0.15s ease;
-}
-
-.start-button:hover {
-  filter: brightness(1.12);
-}
-
-.master-volume-control {
-  display: grid;
-  flex: 1;
-  min-width: 140px;
-  gap: 8px;
-  color: var(--muted);
-  font-size: 10px;
-  letter-spacing: 1px;
-}
-
-.master-volume-control input {
-  width: 100%;
-  accent-color: var(--warm-light);
-}
-
-.audio-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--muted);
-  font-size: 10px;
-  letter-spacing: 1px;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #655d50;
-}
-
-/* Заголовок секции */
-
+/* ЛОГОТИП */
 .section-heading {
-  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+  display: block;
+  align-self: flex-start;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
+  padding: 10px 18px 12px;
+  background: var(--navy);
+  border: 9px solid var(--yellow);
+  border-radius: 13px;
+  box-shadow: none;
 }
-
 .section-heading h2 {
   margin: 0;
-  color: #e4d0b5;
-  font-size: 14px;
-  letter-spacing: 2px;
+  color: var(--yellow);
+  font-family: "Pricedown", Impact, sans-serif;
+  font-size: clamp(38px, 6vw, 76px);
+  font-weight: normal;
+  line-height: 0.95;
+  letter-spacing: 0;
+  text-transform: uppercase;
 }
-
 .section-heading p {
-  margin: 7px 0 0;
-  color: var(--muted);
-  font-size: 12px;
+  display: none;
 }
 
-/* Сетка из шести инструментов */
+/* КНОПКА ПОД ЛОГОТИПОМ */
+.start-button {
+  position: relative;
+  z-index: 2;
+  align-self: flex-end;
+  min-height: 36px;
+  min-width: 0;
+  margin-top: -8px;
+  margin-right: 0;
+  padding: 10px 18px;
+  color: var(--navy);
+  background: var(--yellow);
+  border: none;
+  border-radius: 0 0 12px 12px;
+  font-family: "Gamestation", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: normal;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    filter 0.2s ease,
+    transform 0.2s ease;
+}
+.start-button:hover {
+  filter: brightness(1.08);
+}
+.start-button:active {
+  transform: translateY(2px);
+}
+.start-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+.start-button.is-active {
+  background: var(--yellow);
+  color: var(--navy);
+}
 
+/* ДОПОЛНИТЕЛЬНЫЕ ЭЛЕМЕНТЫ ПАНЕЛИ */
+.master-volume-control,
+.audio-status {
+  display: none;
+}
+
+/* СЕТКА ИНСТРУМЕНТОВ */
 .instruments-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  gap: 23px 21px;
   width: 100%;
-  max-width: 820px;
+  max-width: 935px;
   margin: 0 auto;
 }
 
+/* КАРТОЧКИ ИНСТРУМЕНТОВ */
 .instrument-card {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   align-items: center;
   min-width: 0;
-  padding: 14px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  min-height: 380px;
+  padding: 16px 44px 24px;
+  background: linear-gradient(
+    135deg,
+    rgba(10, 85, 209, 0.83),
+    rgba(30, 65, 155, 0.78)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 5px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.12),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
-/* Залитые цветом квадраты */
-
+/* КВАДРАТЫ ИНСТРУМЕНТОВ */
 .square-object {
   position: relative;
   isolation: isolate;
@@ -158,321 +215,263 @@ input {
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 150px;
+  max-width: 175px;
   aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+  margin: 0 auto 14px;
   padding: 12px;
   overflow: hidden;
-  color: #fff0d8;
-  background: var(--instrument-color);
-  border: 1px solid var(--instrument-light);
-  border-radius: 5px;
+  color: var(--black);
+  background-color: var(--square);
+  background-image: var(--instrument-image, none);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  border: none;
+  border-radius: 0;
   cursor: pointer;
   box-shadow:
-    inset 0 0 22px #0002,
-    0 0 12px var(--instrument-glow);
+    5px 5px 4px rgba(255, 255, 255, 0.65),
+    7px 7px 5px rgba(0, 0, 0, 0.16);
   transition:
-    transform 0.15s ease,
-    filter 0.15s ease,
-    box-shadow 0.15s ease;
+    transform 0.18s ease,
+    filter 0.18s ease,
+    box-shadow 0.18s ease;
 }
-
-/* VHS-сканирующие полосы — только внутри квадрата */
-
+.square-object::before,
 .square-object::after {
-  content: "";
-  position: absolute;
-  z-index: 2;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
-  opacity: 0.28;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent 2px,
-    rgba(20, 12, 8, 0.55) 3px,
-    transparent 4px
-  );
+  content: none;
 }
 
-/* Цветовое смещение и лёгкое VHS-мерцание */
-
-.square-object::before {
-  content: "";
-  position: absolute;
-  z-index: 2;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
-  opacity: 0.22;
-  background:
-    linear-gradient(
-      90deg,
-      rgba(255, 80, 55, 0.25),
-      transparent 14%,
-      transparent 86%,
-      rgba(80, 160, 255, 0.25)
-    ),
-    repeating-linear-gradient(
-      0deg,
-      transparent 0,
-      rgba(255, 230, 190, 0.12) 1px,
-      transparent 2px,
-      transparent 5px
-    );
-  animation: square-vhs-flicker 4s steps(2, end) infinite;
-}
-
-@keyframes square-vhs-flicker {
-  0%,
-  90%,
-  100% {
-    opacity: 0.18;
-    transform: translateX(0);
-  }
-
-  92% {
-    opacity: 0.35;
-    transform: translateX(1px);
-  }
-
-  96% {
-    opacity: 0.12;
-    transform: translateX(-1px);
-  }
-}
-
-.square-object:hover {
-  filter: brightness(1.12);
-  transform: translateY(-2px);
-}
-
-.square-object.is-active {
-  filter: brightness(1.18);
-  box-shadow:
-    inset 0 0 20px #fff1,
-    0 0 22px var(--instrument-glow);
-}
-
-/* Надписи поверх VHS */
-
-.square-number,
-.square-symbol,
-.square-name {
-  position: relative;
-  z-index: 3;
-}
-
+/* СИМВОЛЫ ВНУТРИ КВАДРАТА */
 .square-number {
   position: absolute;
   top: 10px;
   left: 10px;
+  z-index: 2;
   font-size: 10px;
-  opacity: 0.85;
 }
-
 .square-symbol {
-  font-size: clamp(30px, 4vw, 46px);
-  font-weight: 900;
+  position: relative;
+  z-index: 2;
+  color: var(--black);
+  font-family: "Pricedown", Impact, sans-serif;
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: normal;
   line-height: 1;
-  text-shadow: 0 2px 4px #0003;
 }
-
 .square-name {
-  margin-top: 0;
+  position: relative;
+  z-index: 2;
+  margin-top: 5px;
+  font-family: "Gamestation", Arial, sans-serif;
   font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 2px;
+  font-weight: normal;
+  letter-spacing: 1px;
 }
 
-/* Палитра тёмного двора и тёплых окон */
-
-.kick-card {
-  --instrument-color: #9f4033;
-  --instrument-light: #d47a5d;
-  --instrument-glow: #b94d3b66;
+/* СОСТОЯНИЯ ИНСТРУМЕНТОВ */
+.square-object:hover {
+  filter: brightness(1.06);
+  transform: translateY(-2px);
+}
+.square-object.is-active {
+  filter: brightness(1.12);
+  transform: scale(0.97);
+  box-shadow:
+    0 0 0 4px var(--yellow),
+    5px 5px 4px rgba(255, 255, 255, 0.55);
 }
 
-.bass-card {
-  --instrument-color: #82733b;
-  --instrument-light: #c9ae5d;
-  --instrument-glow: #c6a64a66;
-}
-
-.synth-card {
-  --instrument-color: #55535a;
-  --instrument-light: #96909e;
-  --instrument-glow: #96909e55;
-}
-
-.clap-card {
-  --instrument-color: #a85d32;
-  --instrument-light: #e19a56;
-  --instrument-glow: #ce783c66;
-}
-
-.hat-card {
-  --instrument-color: #3f6570;
-  --instrument-light: #78a6ae;
-  --instrument-glow: #547b8b66;
-}
-
+/* ЦВЕТА ИНСТРУМЕНТОВ */
+.kick-card,
+.bass-card,
+.synth-card,
+.clap-card,
+.hat-card,
 .pluck-card {
-  --instrument-color: #86434b;
-  --instrument-light: #c7797e;
-  --instrument-glow: #a9566066;
+  --instrument-color: var(--square);
 }
 
-/* Регуляторы инструментов */
-
+/* РЕГУЛЯТОРЫ */
 .instrument-controls {
   display: grid;
-  gap: 14px;
+  gap: 12px;
   width: 100%;
-  margin-top: 18px;
+  margin-top: auto;
 }
-
 .instrument-controls label {
   display: grid;
-  gap: 7px;
+  gap: 6px;
   min-width: 0;
-  color: var(--muted);
-  font-size: 9px;
-  letter-spacing: 0.6px;
+  color: var(--yellow);
+  font-family: "Gamestation", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: normal;
+  letter-spacing: 0;
 }
-
 .instrument-controls label span {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 5px;
 }
-
 .instrument-controls output {
-  color: #e7d9c5;
+  color: var(--yellow);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 
+/* ПОЛЗУНКИ */
 .instrument-controls input[type="range"] {
+  display: block;
   width: 100%;
-  min-width: 0;
+  height: 20px;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
   cursor: pointer;
 }
-
-.kick-card input[type="range"] {
-  accent-color: #d47a5d;
+.instrument-controls input[type="range"]::-webkit-slider-runnable-track {
+  height: 5px;
+  background: var(--blue-dark);
+  border: none;
+  border-radius: 0;
+}
+.instrument-controls input[type="range"]::-moz-range-track {
+  height: 5px;
+  background: var(--blue-dark);
+  border: none;
+  border-radius: 0;
+}
+.instrument-controls input[type="range"]::-webkit-slider-thumb {
+  width: 17px;
+  height: 25px;
+  margin-top: -10px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--yellow);
+  border: none;
+  border-radius: 0;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25);
+}
+.instrument-controls input[type="range"]::-moz-range-thumb {
+  width: 17px;
+  height: 25px;
+  background: var(--yellow);
+  border: none;
+  border-radius: 0;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25);
 }
 
-.bass-card input[type="range"] {
-  accent-color: #c9ae5d;
-}
-
-.synth-card input[type="range"] {
-  accent-color: #96909e;
-}
-
-.clap-card input[type="range"] {
-  accent-color: #e19a56;
-}
-
-.hat-card input[type="range"] {
-  accent-color: #78a6ae;
-}
-
+/* ЦВЕТА РЕГУЛЯТОРОВ */
+.kick-card input[type="range"],
+.bass-card input[type="range"],
+.synth-card input[type="range"],
+.clap-card input[type="range"],
+.hat-card input[type="range"],
 .pluck-card input[type="range"] {
-  accent-color: #c7797e;
+  accent-color: var(--yellow);
 }
 
-.master-volume-control input[type="range"] {
-  accent-color: var(--warm-light);
-}
-
-/* Нижняя строка */
-
+/* ПОДВАЛ */
 .footer {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   margin-top: 30px;
   padding-top: 16px;
-  border-top: 1px solid var(--border);
-  color: #a18a6c;
-  font-size: 9px;
+  border-top: 1px solid rgba(30, 35, 84, 0.3);
+  color: var(--navy);
+  font-size: 10px;
   letter-spacing: 1px;
 }
 
-/* Планшеты */
+/* ФОКУС С КЛАВИАТУРЫ */
+button:focus-visible,
+input:focus-visible,
+.square-object:focus-visible {
+  outline: 3px solid var(--yellow);
+  outline-offset: 4px;
+}
 
-@media (max-width: 700px) {
+/* ПЛАНШЕТЫ */
+@media (max-width: 900px) {
   body {
-    padding: 12px;
+    padding: 20px;
   }
-
   .stage {
-    padding: 18px;
+    max-width: 760px;
   }
+  .instruments-grid {
+    gap: 16px;
+  }
+  .instrument-card {
+    min-height: 330px;
+    padding: 14px 24px 20px;
+  }
+  .square-object {
+    max-width: 150px;
+  }
+}
 
+/* ТЕЛЕФОНЫ */
+@media (max-width: 600px) {
+  body {
+    padding: 16px 12px 30px;
+  }
+  .master-panel {
+    margin-bottom: 20px;
+  }
+  .section-heading {
+    border-width: 6px;
+    padding: 9px 12px;
+  }
+  .section-heading h2 {
+    font-size: clamp(32px, 10vw, 52px);
+  }
   .instruments-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
   }
-
   .instrument-card {
-    padding: 10px;
+    min-height: 290px;
+    padding: 12px 12px 16px;
   }
-
   .square-object {
-    max-width: 140px;
+    max-width: 135px;
+  }
+  .instrument-controls {
+    gap: 10px;
+  }
+  .instrument-controls label {
+    font-size: 9px;
   }
 }
 
-/* Телефоны */
-
-@media (max-width: 420px) {
-  .stage {
-    padding: 12px;
-  }
-
-  .master-panel {
-    gap: 14px;
-    padding: 12px;
-  }
-
+/* МАЛЕНЬКИЕ ТЕЛЕФОНЫ */
+@media (max-width: 360px) {
   .instruments-grid {
-    gap: 8px;
+    grid-template-columns: 1fr;
   }
-
   .instrument-card {
-    padding: 8px;
+    min-height: 320px;
+    padding: 16px 30px 20px;
   }
-
   .square-object {
-    max-width: 120px;
-  }
-
-  .footer {
-    flex-direction: column;
+    max-width: 160px;
   }
 }
 
+/* УМЕНЬШЕНИЕ АНИМАЦИЙ */
 @media (prefers-reduced-motion: reduce) {
-  .square-object::before {
-    animation: none;
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
   }
-
-  .square-object {
-    transition: none;
-  }
-}
-
-/* VHS выключен по умолчанию */
-.square-object::before,
-.square-object::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0;
-  z-index: 2;
 }

@@ -1,0 +1,386 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --orange: #ff9a08;
+  --navy: #1e2354;
+  --blue: rgba(10, 85, 209, 0.8);
+  --blue-dark: #06378a;
+  --yellow: #eeff10;
+  --square: #ebaf1b;
+  --black: #000000;
+  --white: #ffffff;
+  --instrument-color: var(--square);
+  --page-image: none;
+}
+
+/* ШРИФТЫ */
+@font-face {
+  font-family: "Pricedown";
+  src: url("fonts/Pricedown.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Gamestation";
+  src: url("fonts/Gamestation.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ОСНОВНАЯ СТРАНИЦА */
+html, body {
+  margin: 0;
+  min-height: 100%;
+}
+body {
+  position: relative;
+  min-height: 100vh;
+  padding: 25px 32px 50px;
+  overflow-x: hidden;
+  color: var(--black);
+  background-image: url("images/VHS.jpg");
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+  font-family: "Gamestation", Arial, sans-serif;
+}
+button, input { font: inherit; }
+
+/* ЭФФЕКТ ШУМА */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0.1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+/* ОСНОВНАЯ РАБОЧАЯ ОБЛАСТЬ */
+.stage {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0;
+  overflow: visible;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* ШАПКА: ЛОГОТИП + КНОПКА */
+.master-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  gap: 0;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0;
+  margin: 0 0 23px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+/* ЛОГОТИП */
+.section-heading {
+  position: relative;
+  z-index: 1;
+  display: block;
+  align-self: flex-start;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
+  padding: 10px 18px 12px;
+  background: var(--navy);
+  border: 9px solid var(--yellow);
+  border-radius: 13px;
+  box-shadow: none;
+}
+.section-heading h2 {
+  margin: 0;
+  color: var(--yellow);
+  font-family: "Pricedown", Impact, sans-serif;
+  font-size: clamp(38px, 6vw, 76px);
+  font-weight: normal;
+  line-height: 0.95;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.section-heading p { display: none; }
+
+/* КНОПКА ПОД ЛОГОТИПОМ */
+.start-button {
+  position: relative;
+  z-index: 2;
+  align-self: flex-end;
+  min-height: 36px;
+  min-width: 0;
+  margin-top: -8px;
+  margin-right: 0;
+  padding: 10px 18px;
+  color: var(--navy);
+  background: var(--yellow);
+  border: none;
+  border-radius: 0 0 12px 12px;
+  font-family: "Gamestation", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: normal;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+.start-button:hover { filter: brightness(1.08); }
+.start-button:active { transform: translateY(2px); }
+.start-button:disabled { opacity: 0.65; cursor: wait; }
+.start-button.is-active { background: var(--yellow); color: var(--navy); }
+
+/* ДОПОЛНИТЕЛЬНЫЕ ЭЛЕМЕНТЫ ПАНЕЛИ */
+.master-volume-control, .audio-status { display: none; }
+
+/* СЕТКА ИНСТРУМЕНТОВ */
+.instruments-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 23px 21px;
+  width: 100%;
+  max-width: 935px;
+  margin: 0 auto;
+}
+
+/* КАРТОЧКИ ИНСТРУМЕНТОВ */
+.instrument-card {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  min-height: 380px;
+  padding: 16px 44px 24px;
+  background: linear-gradient(135deg, rgba(10, 85, 209, 0.83), rgba(30, 65, 155, 0.78));
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 5px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12), inset 0 -1px 2px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* КВАДРАТЫ ИНСТРУМЕНТОВ */
+.square-object {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 175px;
+  aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+  margin: 0 auto 14px;
+  padding: 12px;
+  overflow: hidden;
+  color: var(--black);
+  background-color: var(--square);
+  background-image: var(--instrument-image, none);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  box-shadow: 5px 5px 4px rgba(255, 255, 255, 0.65), 7px 7px 5px rgba(0, 0, 0, 0.16);
+  transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+}
+.square-object::before, .square-object::after { content: none; }
+
+/* СИМВОЛЫ ВНУТРИ КВАДРАТА */
+.square-number {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  font-size: 10px;
+}
+.square-symbol {
+  position: relative;
+  z-index: 2;
+  color: var(--black);
+  font-family: "Pricedown", Impact, sans-serif;
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: normal;
+  line-height: 1;
+}
+.square-name {
+  position: relative;
+  z-index: 2;
+  margin-top: 5px;
+  font-family: "Gamestation", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: normal;
+  letter-spacing: 1px;
+}
+
+/* СОСТОЯНИЯ ИНСТРУМЕНТОВ */
+.square-object:hover { filter: brightness(1.06); transform: translateY(-2px); }
+.square-object.is-active {
+  filter: brightness(1.12);
+  transform: scale(0.97);
+  box-shadow: 0 0 0 4px var(--yellow), 5px 5px 4px rgba(255, 255, 255, 0.55);
+}
+
+/* ЦВЕТА ИНСТРУМЕНТОВ */
+.kick-card, .bass-card, .synth-card, .clap-card, .hat-card, .pluck-card {
+  --instrument-color: var(--square);
+}
+
+/* РЕГУЛЯТОРЫ */
+.instrument-controls {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  margin-top: auto;
+}
+.instrument-controls label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  color: var(--yellow);
+  font-family: "Gamestation", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: normal;
+  letter-spacing: 0;
+}
+.instrument-controls label span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+}
+.instrument-controls output {
+  color: var(--yellow);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ПОЛЗУНКИ */
+.instrument-controls input[type="range"] {
+  display: block;
+  width: 100%;
+  height: 20px;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+.instrument-controls input[type="range"]::-webkit-slider-runnable-track {
+  height: 5px;
+  background: var(--blue-dark);
+  border: none;
+  border-radius: 0;
+}
+.instrument-controls input[type="range"]::-moz-range-track {
+  height: 5px;
+  background: var(--blue-dark);
+  border: none;
+  border-radius: 0;
+}
+.instrument-controls input[type="range"]::-webkit-slider-thumb {
+  width: 17px;
+  height: 25px;
+  margin-top: -10px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--yellow);
+  border: none;
+  border-radius: 0;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25);
+}
+.instrument-controls input[type="range"]::-moz-range-thumb {
+  width: 17px;
+  height: 25px;
+  background: var(--yellow);
+  border: none;
+  border-radius: 0;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25);
+}
+
+/* ЦВЕТА РЕГУЛЯТОРОВ */
+.kick-card input[type="range"], .bass-card input[type="range"],
+.synth-card input[type="range"], .clap-card input[type="range"],
+.hat-card input[type="range"], .pluck-card input[type="range"] {
+  accent-color: var(--yellow);
+}
+
+/* ПОДВАЛ */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 30px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(30, 35, 84, 0.3);
+  color: var(--navy);
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+/* ФОКУС С КЛАВИАТУРЫ */
+button:focus-visible, input:focus-visible, .square-object:focus-visible {
+  outline: 3px solid var(--yellow);
+  outline-offset: 4px;
+}
+
+/* ПЛАНШЕТЫ */
+@media (max-width: 900px) {
+  body { padding: 20px; }
+  .stage { max-width: 760px; }
+  .instruments-grid { gap: 16px; }
+  .instrument-card { min-height: 330px; padding: 14px 24px 20px; }
+  .square-object { max-width: 150px; }
+}
+
+/* ТЕЛЕФОНЫ */
+@media (max-width: 600px) {
+  body { padding: 16px 12px 30px; }
+  .master-panel { margin-bottom: 20px; }
+  .section-heading { border-width: 6px; padding: 9px 12px; }
+  .section-heading h2 { font-size: clamp(32px, 10vw, 52px); }
+  .instruments-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .instrument-card { min-height: 290px; padding: 12px 12px 16px; }
+  .square-object { max-width: 135px; }
+  .instrument-controls { gap: 10px; }
+  .instrument-controls label { font-size: 9px; }
+}
+
+/* МАЛЕНЬКИЕ ТЕЛЕФОНЫ */
+@media (max-width: 360px) {
+  .instruments-grid { grid-template-columns: 1fr; }
+  .instrument-card { min-height: 320px; padding: 16px 30px 20px; }
+  .square-object { max-width: 160px; }
+}
+
+/* УМЕНЬШЕНИЕ АНИМАЦИЙ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
